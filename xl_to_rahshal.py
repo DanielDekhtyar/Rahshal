@@ -2,7 +2,10 @@ import openpyxl
 from docx import Document
 import time
 
+# The code copies the coordinates of a specific area from an excel file to a table in Microsoft Word file called 'רכשי לב', or for short 'rahshal'
+
 start_time = time.time()
+
 
 def main():
     # Load the excel workbook
@@ -15,22 +18,26 @@ def main():
         area_name, xl_row = find_area_in_xl(nz_xl, xl_row)
         if area_name != " ":
             results = is_area_in_rahshal(area_name, rahshal)
-            if results is not None: # Check if None is returned, meaning that the area is not in the docx
+            if results is not None:
+                # Check if None is returned, meaning that the area is not in the docx
                 area_name, paragraph = results
-                docx_table = update_table_dimensions_in_rahshal(rahshal, paragraph, nz_xl, xl_row, table_index)
-                
+                docx_table = update_table_dimensions_in_rahshal(
+                    rahshal, paragraph, nz_xl, xl_row, table_index
+                )
                 table_index += 1
-    
+
     rahshal.save(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
     wb.close()
     print("All done and save successfully !")
     print(f"--- The code took {time.time() - start_time} seconds to run ---")
 
+
 # 'TypeError: cannot unpack non-iterable NoneType object' solved by putting all the return values in to one tuple
 # If the function didn't do it's work then return this one variable as None
 # At the receiving end, check if the return value is None, else you can safely unpack the tuple and use it.
 
-def find_area_in_xl(nz_xl, xl_row): # TESTED AND DONE !
+
+def find_area_in_xl(nz_xl, xl_row):  # TESTED AND DONE !
     for row in range(xl_row + 1, nz_xl.max_row + 1):
         cell_value = nz_xl[f"A{row}"].value
         if cell_value is not None:
@@ -44,8 +51,9 @@ def is_area_in_rahshal(area_name, rahshal):
         if area_name == paragraph.text:
             results = area_name, paragraph
             return results
-        
-    print(f"The area {area_name[::-1]} is not in the docx") # If area is not in rahshal, an error message will appear
+
+    print(f"The area {area_name[::-1]} is not in the docx")
+    # If area is not in rahshal, an error message will appear
     return None
 
 
@@ -67,8 +75,9 @@ def update_table_dimensions_in_rahshal(rahshal, paragraph, nz_xl, xl_row, table_
             table_element.remove(row_element)
     elif rows_old_table == rows_new_table:
         pass
-    
+
     return docx_table
+
 
 def xl_table_dimensions(nz_xl, xl_row):  # TESTED AND DONE !
     int(xl_row)
