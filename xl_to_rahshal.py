@@ -21,13 +21,19 @@ def main():
             if results is not None:
                 # Check if None is returned, meaning that the area is not in the docx
                 area_name, paragraph = results
+                print("Now copying area", area_name[::-1])
                 docx_table = update_table_dimensions_in_rahshal(
                     rahshal, paragraph, nz_xl, xl_row, table_index
+                    )
+                docx_table = copy_coordinates_from_xl_to_rahshal(
+                    nz_xl, docx_table, xl_row
                 )
-                table_index += 1
+                table_index += 1  # Counts how many tables copied
 
     rahshal.save(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
     wb.close()
+    print("")  # Just a white line
+    print(table_index, "areas has been copied for the excel file to rahshal")
     print("All done and save successfully !")
     print(f"--- The code took {time.time() - start_time} seconds to run ---")
 
@@ -51,8 +57,9 @@ def is_area_in_rahshal(area_name, rahshal):
         if area_name == paragraph.text:
             results = area_name, paragraph
             return results
-
+    print("$$$$$$$$")
     print(f"The area {area_name[::-1]} is not in the docx")
+    print("$$$$$$$$")
     # If area is not in rahshal, an error message will appear
     return None
 
@@ -103,6 +110,21 @@ def xl_table_dimensions(nz_xl, xl_row):  # TESTED AND DONE !
 
     number_of_rows_in_table = last_row_of_table - first_row_of_table
     return number_of_rows_in_table
+
+
+def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row):
+    # Copies the content of the table from excel to docx
+    for row in range(2, len(docx_table.rows) + 1):
+        # Start at row 2 because we need to leave space for the 2 default rows
+        for column in range(1, 7):  # Columns 1 to 7 in the excel
+            cell = nz_xl.cell(
+                (int(xl_row) + row) + 2, column + 1
+            )  # 'row + 2' because don't need to copy the first 2 rows
+            if cell.value is not None:
+                docx_table.cell(row, column - 1).text = str(
+                    cell.value
+                )  # 'column - 1' because the table starts at 1 and not at 0. Otherwise 'index out of range'
+    return docx_table
 
 
 if __name__ == "__main__":
