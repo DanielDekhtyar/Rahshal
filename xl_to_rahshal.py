@@ -1,5 +1,7 @@
 import openpyxl
 from docx import Document
+from docx.enum.text import WD_COLOR_INDEX
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 import time
 
 # The code copies the coordinates of a specific area from an excel file to a table in Microsoft Word file called 'רכשי לב', or for short 'rahshal'
@@ -28,6 +30,7 @@ def main():
                 docx_table = copy_coordinates_from_xl_to_rahshal(
                     nz_xl, docx_table, xl_row
                 )
+                docx_table = style_the_docx_table(docx_table)
                 table_index += 1  # Counts how many tables copied
 
     rahshal.save(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
@@ -57,9 +60,9 @@ def is_area_in_rahshal(area_name, rahshal):
         if area_name == paragraph.text:
             results = area_name, paragraph
             return results
-    print("$$$$$$$$")
+    print("----------------------------------------------")
     print(f"The area {area_name[::-1]} is not in the docx")
-    print("$$$$$$$$")
+    print("----------------------------------------------")
     # If area is not in rahshal, an error message will appear
     return None
 
@@ -126,6 +129,14 @@ def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row):
                 )  # 'column - 1' because the table starts at 1 and not at 0. Otherwise 'index out of range'
     return docx_table
 
+
+def style_the_docx_table(docx_table):
+    for row in docx_table.rows:
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.font.highlight_color = WD_COLOR_INDEX.YELLOW
+                    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 if __name__ == "__main__":
     main()
