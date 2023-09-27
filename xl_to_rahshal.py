@@ -11,30 +11,30 @@ start_time = time.time()
 
 def main():
     # Load the excel workbook
-    wb = openpyxl.load_workbook(r"C:\Users\Daniel\Desktop\Iron Dome\Coordinates.xlsx")
-    nz_xl = wb.active  # nz means נ.צ
+    excel_workbook = openpyxl.load_workbook(r"C:\Users\Daniel\Desktop\Iron Dome\Coordinates.xlsx")
+    nz_xl = excel_workbook.active  # Open the active sheet; nz means נ.צ
+    # Load the docx file
     rahshal = Document(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
     xl_row = 1
     table_index = 0
     while xl_row < nz_xl.max_row:
         area_name, xl_row = find_area_in_xl(nz_xl, xl_row)
         if area_name != " ":
-            results = is_area_in_rahshal(area_name, rahshal)
-            if results is not None:
-                # Check if None is returned, meaning that the area is not in the docx
-                area_name, paragraph = results
-                print("Now copying area", area_name[::-1])
+            area_name = is_area_in_rahshal(area_name, rahshal)
+            # Check if None is returned, meaning that the area is not in the docx
+            if area_name is not None:
                 docx_table = update_table_dimensions_in_rahshal(
-                    rahshal, paragraph, nz_xl, xl_row, table_index
+                    rahshal, nz_xl, xl_row, table_index
                     )
                 docx_table = copy_coordinates_from_xl_to_rahshal(
                     nz_xl, docx_table, xl_row
                 )
                 docx_table = style_the_docx_table(docx_table)
+                print("Successfully copied", area_name[::-1])
                 table_index += 1  # Counts how many tables copied
 
     rahshal.save(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
-    wb.close()
+    excel_workbook.close()
     print("")  # Just a white line
     print(table_index, "areas has been copied for the excel file to rahshal")
     print("All done and save successfully !")
@@ -46,7 +46,7 @@ def main():
 # At the receiving end, check if the return value is None, else you can safely unpack the tuple and use it.
 
 
-def find_area_in_xl(nz_xl, xl_row):  # TESTED AND DONE !
+def find_area_in_xl(nz_xl, xl_row: int):  # TESTED AND DONE !
     for row in range(xl_row + 1, nz_xl.max_row + 1):
         cell_value = nz_xl[f"A{row}"].value
         if cell_value is not None:
@@ -55,19 +55,18 @@ def find_area_in_xl(nz_xl, xl_row):  # TESTED AND DONE !
     return " ", row
 
 
-def is_area_in_rahshal(area_name, rahshal):
+def is_area_in_rahshal(area_name: int, rahshal):
     for i, paragraph in enumerate(rahshal.paragraphs):
         if area_name == paragraph.text:
-            results = area_name, paragraph
-            return results
+            return area_name
+    # If area is not in rahshal, an error message will appear
     print("----------------------------------------------")
     print(f"The area {area_name[::-1]} is not in the docx")
     print("----------------------------------------------")
-    # If area is not in rahshal, an error message will appear
     return None
 
 
-def update_table_dimensions_in_rahshal(rahshal, paragraph, nz_xl, xl_row, table_index):
+def update_table_dimensions_in_rahshal(rahshal, nz_xl, xl_row : int, table_index: int):
     tables = rahshal.tables
     docx_table = tables[table_index]
     rows_old_table = len(docx_table.rows)
@@ -89,9 +88,9 @@ def update_table_dimensions_in_rahshal(rahshal, paragraph, nz_xl, xl_row, table_
     return docx_table
 
 
-def xl_table_dimensions(nz_xl, xl_row):  # TESTED AND DONE !
-    int(xl_row)
+def xl_table_dimensions(nz_xl, xl_row: int):  # TESTED AND DONE !
     # Finds the number of rows in the table
+    int(xl_row)
     first_row_of_table = None
     last_row_of_table = None
     # I added +1 to max_row because otherwise it will go upto the one to last but not the last row
@@ -114,11 +113,10 @@ def xl_table_dimensions(nz_xl, xl_row):  # TESTED AND DONE !
     number_of_rows_in_table = last_row_of_table - first_row_of_table
     return number_of_rows_in_table
 
-
-def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row):
-    # Copies the content of the table from excel to docx
+# Copies the content of the table from excel to docx
+def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row: int):
+    # Start at row 2 because we need to leave space for the 2 default rows
     for row in range(2, len(docx_table.rows) + 1):
-        # Start at row 2 because we need to leave space for the 2 default rows
         for column in range(1, 7):  # Columns 1 to 7 in the excel
             cell = nz_xl.cell(
                 (int(xl_row) + row) + 2, column + 1
