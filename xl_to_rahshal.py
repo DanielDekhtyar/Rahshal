@@ -55,7 +55,7 @@ def find_area_in_xl(nz_xl, xl_row: int):  # TESTED AND DONE !
     return " ", row
 
 
-def is_area_in_rahshal(area_name: int, rahshal):
+def is_area_in_rahshal(area_name: str, rahshal):
     for i, paragraph in enumerate(rahshal.paragraphs):
         if area_name == paragraph.text:
             return area_name
