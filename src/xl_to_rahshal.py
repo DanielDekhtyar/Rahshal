@@ -20,9 +20,7 @@ def main():
     while xl_row < nz_xl.max_row:
         area_name, xl_row = find_area_in_xl(nz_xl, xl_row)
         if area_name != " ":
-            area_name = is_area_in_rahshal(area_name, rahshal)
-            # Check if None is returned, meaning that the area is not in the docx
-            if area_name is not None:
+            if is_area_in_rahshal(area_name, rahshal):
                 docx_table = update_table_dimensions_in_rahshal(
                     rahshal, nz_xl, xl_row, table_index
                     )
@@ -58,12 +56,12 @@ def find_area_in_xl(nz_xl, xl_row: int):  # TESTED AND DONE !
 def is_area_in_rahshal(area_name: str, rahshal):
     for i, paragraph in enumerate(rahshal.paragraphs):
         if area_name == paragraph.text:
-            return area_name
+            return True
     # If area is not in rahshal, an error message will appear
     print("----------------------------------------------")
     print(f"The area {area_name[::-1]} is not in the docx")
     print("----------------------------------------------")
-    return None
+    return False
 
 
 def update_table_dimensions_in_rahshal(rahshal, nz_xl, xl_row : int, table_index: int):
