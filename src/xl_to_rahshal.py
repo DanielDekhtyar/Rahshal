@@ -6,6 +6,16 @@ The code copies the coordinates of a specific area from an excel file,
 to a table in Microsoft Word file called 'רכשי לב',or for short 'rahshal'
 """
 
+"""
+Text prints in revers bug solution : 
+Before that only the first table was right and the rest were reversed.
+I solved it by defining a global variable that keeps tack of the number of tables that is already modified.
+If table_index == 0 means that we are still on the first table.
+If it is bigger then 0 then we have passed the first table.
+So to fix the bug it intentionally prints the values in reverse and the final product is as expected !
+a.k.a backward logic
+"""
+
 
 import openpyxl
 from docx import Document
@@ -16,6 +26,7 @@ import time
 
 start_time = time.time()
 
+table_index = 0
 
 def main():
     # Load the excel workbook
@@ -24,20 +35,19 @@ def main():
     # Load the docx file
     rahshal = Document(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
     xl_row = 1
-    table_index = 0
     tables = rahshal.tables
+    global table_index
     while xl_row < nz_xl.max_row:
         area_name, xl_row = find_area_in_xl(nz_xl, xl_row)
         if area_name != " ":
-            area_name = is_area_in_rahshal(area_name, rahshal)
             # Check if None is returned, meaning that the area is not in the docx
-            if area_name is not None:
+            if is_area_in_rahshal(area_name, rahshal):
                 docx_table = tables[table_index]
                 update_table_dimensions_in_rahshal(rahshal, nz_xl, xl_row, table_index)
                 copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row)
                 style_the_docx_table(docx_table)
                 print("Successfully copied", area_name[::-1])
-                table_index += 1  # Counts how many tables copied
+                table_index = table_index + 1
 
     rahshal.save(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
     excel_workbook.close()
@@ -62,14 +72,18 @@ def find_area_in_xl(nz_xl, xl_row: int):  # TESTED AND DONE !
 
 
 def is_area_in_rahshal(area_name: str, rahshal):
-    for i, paragraph in enumerate(rahshal.paragraphs):
-        if area_name == paragraph.text:
-            return area_name
+    for table in rahshal.tables:
+        if table_index == 0:
+            if table.cell(1, 5).text == area_name:
+                return True # FIXME: Return the table index and not just True
+        else:
+            if table.cell(1, 0).text == area_name:
+                return True
     # If area is not in rahshal, an error message will appear
     print("----------------------------------------------")
     print(f"The area {area_name[::-1]} is not in the docx")
     print("----------------------------------------------")
-    return None
+    return False
 
 
 def update_table_dimensions_in_rahshal(rahshal, nz_xl, xl_row : int, table_index: int):
@@ -121,16 +135,22 @@ def xl_table_dimensions(nz_xl, xl_row: int):  # TESTED AND DONE !
 
 # Copies the content of the table from excel to docx
 def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row: int):
-    # BUG: Starting table 2 and on the coordinates are from the last row to the first row
     # Start at row 2 because we need to leave space for the 2 default rows
     for row in range(5, len(docx_table.rows)):
-        for column in range(1, 7):  # Columns 1 to 7 in the excel
-            cell = nz_xl.cell((int(xl_row) + row) - 1, column + 1) 
-            # 'row + 2' because don't need to copy the first 2 rows
-            if cell.value is not None:
-                docx_table.cell(row, column - 1).text = str(cell.value)
-                # 'column - 1' because in docx it start from index 0 and in excel it starts from index 1
-
+        if table_index == 0:
+            for column in range(1, 7):  # Columns 1 to 7 in the excel
+                cell = nz_xl.cell((int(xl_row) + row) - 1, column + 1) 
+                # 'row + 2' because don't need to copy the first 2 rows
+                if cell.value is not None:
+                    docx_table.cell(row, column - 1).text = str(cell.value)
+                    # 'column - 1' because in docx it start from index 0 and in excel it starts from index 1
+        else:
+            for column in range(1, 7):  # Columns 1 to 7 in the excel
+                cell = nz_xl.cell((int(xl_row) + row) - 1, column + 1) 
+                # 'row + 2' because don't need to copy the first 2 rows
+                if cell.value is not None:
+                    docx_table.cell(row, abs(column - 6)).text = str(cell.value)
+                    # 'abs(column - 6)' explanation in the doc in the start of the document
 
 def style_the_docx_table(docx_table):
     for row in docx_table.rows:
@@ -139,6 +159,7 @@ def style_the_docx_table(docx_table):
                 for run in paragraph.runs:
                     run.font.highlight_color = WD_COLOR_INDEX.YELLOW
                     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    run.font.name = "Calibri Light"
 
 if __name__ == "__main__":
     main()
