@@ -1,6 +1,6 @@
 """
 Author : Daniel Dekhtyar
-Latest update : 29/09/2023
+Latest update : 1/10/2023
 
 The code copies the coordinates of a specific area from an excel file,
 to a table in Microsoft Word file called 'רכשי לב',or for short 'rahshal'
@@ -76,7 +76,8 @@ def update_table_dimensions_in_rahshal(rahshal, nz_xl, xl_row : int, table_index
     tables = rahshal.tables
     docx_table = tables[table_index]
     rows_old_table = len(docx_table.rows)
-    rows_new_table = xl_table_dimensions(nz_xl, xl_row)
+    rows_new_table = xl_table_dimensions(nz_xl, xl_row) + 3
+    # Add +3 to rows_new_table because 3 rows added to the docx_table to have the new format
     
     if rows_old_table == rows_new_table:
         pass
@@ -122,14 +123,13 @@ def xl_table_dimensions(nz_xl, xl_row: int):  # TESTED AND DONE !
 def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row: int):
     # BUG: Starting table 2 and on the coordinates are from the last row to the first row
     # Start at row 2 because we need to leave space for the 2 default rows
-    for row in range(2, len(docx_table.rows) + 1):
+    for row in range(5, len(docx_table.rows)):
         for column in range(1, 7):  # Columns 1 to 7 in the excel
-            cell = nz_xl.cell((int(xl_row) + row) + 2, column + 1) 
+            cell = nz_xl.cell((int(xl_row) + row) - 1, column + 1) 
             # 'row + 2' because don't need to copy the first 2 rows
             if cell.value is not None:
                 docx_table.cell(row, column - 1).text = str(cell.value)
-                # 'column - 1' because the table starts at 1 and not at 0. Otherwise 'index out of range'
-    return docx_table
+                # 'column - 1' because in docx it start from index 0 and in excel it starts from index 1
 
 
 def style_the_docx_table(docx_table):
