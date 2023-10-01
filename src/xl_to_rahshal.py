@@ -1,3 +1,12 @@
+"""
+Author : Daniel Dekhtyar
+Latest update : 29/09/2023
+
+The code copies the coordinates of a specific area from an excel file,
+to a table in Microsoft Word file called 'רכשי לב',or for short 'rahshal'
+"""
+
+
 import openpyxl
 from docx import Document
 from docx.enum.text import WD_COLOR_INDEX
@@ -17,19 +26,17 @@ def main():
     rahshal = Document(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
     xl_row = 1
     table_index = 0
+    tables = rahshal.tables
     while xl_row < nz_xl.max_row:
         area_name, xl_row = find_area_in_xl(nz_xl, xl_row)
         if area_name != " ":
             area_name = is_area_in_rahshal(area_name, rahshal)
             # Check if None is returned, meaning that the area is not in the docx
             if area_name is not None:
-                docx_table = update_table_dimensions_in_rahshal(
-                    rahshal, nz_xl, xl_row, table_index
-                    )
-                docx_table = copy_coordinates_from_xl_to_rahshal(
-                    nz_xl, docx_table, xl_row
-                )
-                docx_table = style_the_docx_table(docx_table)
+                docx_table = tables[table_index]
+                update_table_dimensions_in_rahshal(rahshal, nz_xl, xl_row, table_index)
+                copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row)
+                style_the_docx_table(docx_table)
                 print("Successfully copied", area_name[::-1])
                 table_index += 1  # Counts how many tables copied
 
@@ -71,7 +78,10 @@ def update_table_dimensions_in_rahshal(rahshal, nz_xl, xl_row : int, table_index
     docx_table = tables[table_index]
     rows_old_table = len(docx_table.rows)
     rows_new_table = xl_table_dimensions(nz_xl, xl_row)
-    if rows_old_table < rows_new_table:
+    
+    if rows_old_table == rows_new_table:
+        pass
+    elif rows_old_table < rows_new_table:
         rows_to_add = rows_new_table - rows_old_table
         for _ in range(rows_to_add):
             docx_table.add_row()
@@ -82,10 +92,6 @@ def update_table_dimensions_in_rahshal(rahshal, nz_xl, xl_row : int, table_index
             table_element = docx_table._tbl
             row_element = row._tr
             table_element.remove(row_element)
-    elif rows_old_table == rows_new_table:
-        pass
-
-    return docx_table
 
 
 def xl_table_dimensions(nz_xl, xl_row: int):  # TESTED AND DONE !
@@ -115,16 +121,15 @@ def xl_table_dimensions(nz_xl, xl_row: int):  # TESTED AND DONE !
 
 # Copies the content of the table from excel to docx
 def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row: int):
+    # BUG: Starting table 2 and on the coordinates are from the last row to the first row
     # Start at row 2 because we need to leave space for the 2 default rows
     for row in range(2, len(docx_table.rows) + 1):
         for column in range(1, 7):  # Columns 1 to 7 in the excel
-            cell = nz_xl.cell(
-                (int(xl_row) + row) + 2, column + 1
-            )  # 'row + 2' because don't need to copy the first 2 rows
+            cell = nz_xl.cell((int(xl_row) + row) + 2, column + 1) 
+            # 'row + 2' because don't need to copy the first 2 rows
             if cell.value is not None:
-                docx_table.cell(row, column - 1).text = str(
-                    cell.value
-                )  # 'column - 1' because the table starts at 1 and not at 0. Otherwise 'index out of range'
+                docx_table.cell(row, column - 1).text = str(cell.value)
+                # 'column - 1' because the table starts at 1 and not at 0. Otherwise 'index out of range'
     return docx_table
 
 
