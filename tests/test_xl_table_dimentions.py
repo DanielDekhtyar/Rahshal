@@ -1,4 +1,4 @@
-from xl_to_rahshal import xl_table_dimensions
+from src.xl_to_rahshal import xl_table_dimensions
 import openpyxl
 wb = openpyxl.load_workbook(r"C:\Users\Daniel\Desktop\Iron Dome\Coordinates.xlsx")
 nz_xl = wb.active  # nz means נ.צ

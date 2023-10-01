@@ -13,7 +13,6 @@ from docx.enum.text import WD_COLOR_INDEX
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 import time
 
-# The code copies the coordinates of a specific area from an excel file to a table in Microsoft Word file called 'רכשי לב', or for short 'rahshal'
 
 start_time = time.time()
 
