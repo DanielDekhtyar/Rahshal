@@ -1,6 +1,7 @@
 """
 Author : Daniel Dekhtyar
 Latest update : 1/10/2023
+Version : 1.0
 
 The code copies the coordinates of a specific area from an excel file,
 to a table in Microsoft Word file called 'רכשי לב',or for short 'rahshal'
@@ -72,7 +73,7 @@ def find_area_in_xl(nz_xl, xl_row: int) -> (str, int):  # TESTED AND DONE !
     return " ", row
 
 
-def find_area_in_rahshal(area_name: str, rahshal) -> int or None:
+def find_area_in_rahshal(area_name: str, rahshal: Document) -> int or None:
     table_index = 0
     for table in rahshal.tables:
         if table_count == 0:
@@ -89,7 +90,7 @@ def find_area_in_rahshal(area_name: str, rahshal) -> int or None:
     return None
 
 
-def update_table_dimensions_in_rahshal(rahshal, nz_xl, xl_row : int, table_index: int) -> None:
+def update_table_dimensions_in_rahshal(rahshal: Document, nz_xl, xl_row : int, table_index: int) -> None:
     tables = rahshal.tables
     docx_table = tables[table_index]
     rows_old_table = len(docx_table.rows)
@@ -137,7 +138,7 @@ def xl_table_dimensions(nz_xl, xl_row: int) -> int:  # TESTED AND DONE !
     return number_of_rows_in_table
 
 # Copies the content of the table from excel to docx
-def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row: int) -> None:
+def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table: Document, xl_row: int) -> None:
     # Start at row 2 because we need to leave space for the 2 default rows
     for row in range(5, len(docx_table.rows)):
         if table_count == 0:
@@ -155,7 +156,7 @@ def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table, xl_row: int) -> None:
                     docx_table.cell(row, abs(column - 6)).text = str(cell.value)
                     # 'abs(column - 6)' explanation in the doc in the start of the document
 
-def style_the_docx_table(docx_table) -> None:
+def style_the_docx_table(docx_table: Document) -> None:
     for row in docx_table.rows:
         for cell in row.cells:
             for paragraph in cell.paragraphs:
