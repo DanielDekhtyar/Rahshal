@@ -57,9 +57,7 @@ def add_3_rows_and_move_text_down(table):
 
     # Iterate through the existing rows and cells in the table starting from row 2
     for i in range(1, len(table.rows)):
-        row_values = []
-        for cell in table.rows[i].cells:
-            row_values.append(cell.text)
+        row_values = [cell.text for cell in table.rows[i].cells]
         original_values.append(row_values)
 
     # Insert three new rows

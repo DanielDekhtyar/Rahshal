@@ -1,10 +1,18 @@
 """
 Author : Daniel Dekhtyar
-Latest update : 1/10/2023
-Version : 1.0
+Latest update : 4/10/2023
+Version : 1.0.1
 
 The code copies the coordinates of a specific area from an excel file,
 to a table in Microsoft Word file called 'רכשי לב',or for short 'rahshal'
+
+Changelog :
+1.0.1 (4-10-2023)
+>> Minor code readability improvement
+
+1.0.0 (2-10-2023)
+>> First fully working version of the code.
+>> find_area_in_rahshal() reimplemented to fit the new docx format
 """
 
 """
@@ -67,21 +75,18 @@ def main():
 def find_area_in_xl(nz_xl, xl_row: int) -> (str, int):  # TESTED AND DONE !
     for row in range(xl_row + 1, nz_xl.max_row + 1):
         cell_value = nz_xl[f"A{row}"].value
-        if cell_value is not None:
-            if "קורדינטות" not in cell_value:
-                return cell_value, row
+        if cell_value is not None and "קורדינטות" not in cell_value:
+            return cell_value, row
     return " ", row
 
 
 def find_area_in_rahshal(area_name: str, rahshal: Document) -> int or None:
-    table_index = 0
-    for table in rahshal.tables:
+    for table_index, table in enumerate(rahshal.tables):
         if table_count == 0:
             if table.cell(1, 5).text == area_name:
                 return int(table_index)
-        else:
-            if table.cell(1, 0).text == area_name:
-                return int(table_index)
+        elif table.cell(1, 0).text == area_name:
+            return int(table_index)
         table_index += 1
     # If area is not in rahshal, an error message will appear
     print("----------------------------------------------")
@@ -114,13 +119,13 @@ def update_table_dimensions_in_rahshal(rahshal: Document, nz_xl, xl_row : int, t
 
 def xl_table_dimensions(nz_xl, xl_row: int) -> int:  # TESTED AND DONE !
     # Finds the number of rows in the table
-    int(xl_row)
+    xl_row
     first_row_of_table = None
     last_row_of_table = None
     # I added +1 to max_row because otherwise it will go upto the one to last but not the last row
     max_row = nz_xl.max_row + 1
 
-    for row in range(int(xl_row), max_row):
+    for row in range(xl_row, max_row):
         cell_in_column_B = nz_xl.cell(row, 2)  # 2 corresponds to column B
         if cell_in_column_B.value is not None:
             first_row_of_table = row
@@ -134,8 +139,7 @@ def xl_table_dimensions(nz_xl, xl_row: int) -> int:  # TESTED AND DONE !
         elif row == max_row:
             last_row_of_table = max_row
 
-    number_of_rows_in_table = last_row_of_table - first_row_of_table
-    return number_of_rows_in_table
+    return last_row_of_table - first_row_of_table
 
 # Copies the content of the table from excel to docx
 def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table: Document, xl_row: int) -> None:
@@ -143,14 +147,14 @@ def copy_coordinates_from_xl_to_rahshal(nz_xl, docx_table: Document, xl_row: int
     for row in range(5, len(docx_table.rows)):
         if table_count == 0:
             for column in range(1, 7):  # Columns 1 to 7 in the excel
-                cell = nz_xl.cell((int(xl_row) + row) - 1, column + 1) 
+                cell = nz_xl.cell((xl_row + row) - 1, column + 1) 
                 # 'row + 2' because don't need to copy the first 2 rows
                 if cell.value is not None:
                     docx_table.cell(row, column - 1).text = str(cell.value)
                     # 'column - 1' because in docx it start from index 0 and in excel it starts from index 1
         else:
             for column in range(1, 7):  # Columns 1 to 7 in the excel
-                cell = nz_xl.cell((int(xl_row) + row) - 1, column + 1) 
+                cell = nz_xl.cell((xl_row + row) - 1, column + 1) 
                 # 'row + 2' because don't need to copy the first 2 rows
                 if cell.value is not None:
                     docx_table.cell(row, abs(column - 6)).text = str(cell.value)
