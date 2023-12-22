@@ -40,7 +40,9 @@ def add_rows():
         first_row(table)
         style_the_docx_table(table)
         table_count += 1
-        print(f"Table {table_count} of {len(rahshal.tables)} modified according to the new format")
+        print(
+            f"Table {table_count} of {len(rahshal.tables)} modified according to the new format"
+        )
 
     rahshal.save(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
     print("All done and save successfully !")
@@ -126,7 +128,7 @@ def merge_third_row(table, rahshal):
         merged_cell.text = "קואורדינטות"
         for paragraph in merged_cell.paragraphs:
             for run in paragraph.runs:
-                ''' You can enable different designs '''
+                """You can enable different designs"""
                 # run.font.bold = True
                 # run.underline = True
                 run.font.size = Pt(12)
@@ -134,6 +136,13 @@ def merge_third_row(table, rahshal):
 
 
 def style_the_docx_table(table):
+    """
+    The function `style_the_docx_table` is used to style a table in a docx document by setting the
+    column widths and aligning the text in the cells.
+
+    Args:
+    table: The `table` parameter is the table object in a Word document that you want to style.
+    """
     table.autofit = False
     # Define the desired column width in centimeters (3 cm)
 
@@ -151,6 +160,14 @@ def style_the_docx_table(table):
 
 
 def first_row(table):
+    """
+    The `first_row` function sets the text and formatting for the first row of a table, including
+    shading it with a light gray color.
+
+    Args:
+    table: The parameter "table" is the table object that you want to modify. It is assumed to be a
+    valid table object with rows and cells.
+    """
     # Read doc at the top to explanation
     if table_count == 0:
         table.cell(0, 5).text = "שם אזור"
