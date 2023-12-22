@@ -3,7 +3,7 @@
 
 ## This is a script designed to copy coordinates from an Excel file to a table in Microsoft Word
 
-### *A script for optimizing a time-consuming task in the military.*
+### *This script optimizes a time-consuming task in the military* 💂‍♂️
 
 > No classified data is included in this repository
 
