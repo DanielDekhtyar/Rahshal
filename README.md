@@ -1,5 +1,4 @@
 # Rahshal
----
 
 ## This is a script designed to copy coordinates from an Excel file to a table in Microsoft Word
 
