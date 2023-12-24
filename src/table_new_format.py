@@ -2,7 +2,31 @@
 Author : Daniel Dekhtyar
 Latest update : 2/10/2023
 
-The code adds 3 rows at the top of the table in formats it as required
+The `add_rows()` function is the main function of the script. It iterates through all tables in the document and performs the following steps for each table:
+1. Adds 3 rows to the table and moves the text down by two rows.
+2. Formats the table by merging cells, setting text values, and applying shading.
+3. Sets the text and formatting of the first row of the table.
+4. Styles the table by setting column widths, aligning paragraphs, and changing the font.
+5. Saves the modified document with the changes.
+
+The code modifies the tables in the Word document by adding 3 rows, moving the text down, and applying formatting. The modified document is then saved with the changes.
+
+Example Usage:
+```python
+# Create a Word document object
+document = Document()
+
+# Create a table object
+table = document.add_table(rows=5, cols=6)
+
+# Call the add_rows() function to add 3 rows to the table and format it
+add_rows()
+
+# The table will have 8 rows in total, with the first 3 rows added and the remaining 5 rows from the original table
+# The text in each cell will be moved down by two rows
+# The table will be formatted with merged cells, shading, and specific text values in the first row
+# The modified document will be saved with the changes
+```
 """
 
 """
@@ -32,13 +56,9 @@ table_count = 0
 
 def add_rows():
     """
-    Modifies tables in a Word document by adding 3 rows at the top and formatting the tables according to a specific format.
-
-    Args:
-        None
-
-    Returns:
-        None
+    The function `add_rows()` iterates through all tables in a Word document, adds 3 rows to each table,
+    moves text down the tables to the new format, applies required formatting to the tables, and saves
+    the modified document.
     """
     rahshal = Document(r"C:\Users\Daniel\Desktop\Iron Dome\רכשי לב.docx")
     global table_count
@@ -62,13 +82,13 @@ def add_rows():
 
 def add_3_rows_and_move_text_down(table):
     """
-    Adds 3 rows at the top of the table and moves the existing content down.
+    The function adds three new rows to a table and moves the text in each cell down by two rows.
 
     Args:
-        table (Table): The table to modify.
-
-    Returns:
-        None
+    table: The parameter 'table' is expected to be a data structure representing a table. It could be
+    a list of lists, where each inner list represents a row and contains the values of the cells in that
+    row. Alternatively, it could be an object representing a table with methods to add rows and access
+    cells
     """
     # Implementation of the function
     pass
@@ -94,14 +114,14 @@ def add_3_rows_and_move_text_down(table):
 
 def make_table_format_as_required(table, rahshal):
     """
-    Formats the given table by clearing the content of certain cells, merging cells, setting shading, and updating the text in specific cells.
+    The function `make_table_format_as_required` modifies a table by merging cells, setting text values,
+    and applying shading.
 
     Args:
-        table (Table): The table object that needs to be formatted.
-        rahshal: A parameter that is used in the merge_third_row function.
-
-    Returns:
-        None. The function modifies the input table object in-place.
+    table: The "table" parameter is a table object that represents a table in a document. It is used
+    to access and modify the cells and properties of the table.
+    rahshal: The parameter "rahshal" is not defined in the code snippet you provided. Please provide
+    the definition of "rahshal" so that I can assist you further.
     """
     for i in range(4):
         for cell in table.rows[i].cells:
@@ -132,16 +152,18 @@ def make_table_format_as_required(table, rahshal):
 
 def set_shading(row_start: int, row_end: int, color: str, table):
     """
-    Sets the shading color for a range of cells in a table.
+    The function `set_shading` sets the shading color for a range of cells in a table.
 
     Args:
-        row_start (int): The starting row index for setting the shading.
-        row_end (int): The ending row index (exclusive) for setting the shading.
-        color (str): The color code for the shading.
-        table: The table object in which the shading needs to be set.
-
-    Returns:
-        None. The function modifies the shading of the specified cells in the table object.
+    row_start (int): The starting row index where the shading should be applied.
+    row_end (int): The `row_end` parameter is an integer that represents the ending row index
+    (exclusive) for setting the shading. This means that the shading will be applied to all rows from
+    `row_start` to `row_end - 1`.
+    color (str): The "color" parameter is a string that represents the color of the shading that you
+    want to apply to the cells in the table. It should be a valid color value, such as "FF0000" for red
+    or "00FF00" for green.
+    table: The `table` parameter is the table object that you want to apply shading to. It should be
+    an instance of a table class, such as `docx.table.Table`.
     """
     for row in range(row_start, row_end):  # Set the shading
         for cell in range(len(table.rows[row].cells)):
@@ -159,14 +181,14 @@ def set_shading(row_start: int, row_end: int, color: str, table):
 
 def merge_third_row(table, rahshal):
     """
-    Merge two cells in the third row of a table and set the text and formatting of the merged cell.
+    The function `merge_third_row` merges adjacent cells in the third row of a table and sets the text
+    in the merged cell to "קואורדינטות" with a specific font size and style.
 
     Args:
-        table (Table): The table object in which the cells need to be merged.
-        rahshal: A parameter that is used in the function.
-
-    Returns:
-        None. The function modifies the table object in-place by merging cells and setting the text and formatting of the merged cell.
+    table: The "table" parameter is the table object that you want to modify. It should be an instance
+    of the Table class.
+    rahshal: The parameter "rahshal" is not used in the code provided. It seems to be an unused
+    variable.
     """
     for cell in range(len(table.rows[2].cells) - 1):
         cell_a = table.cell(2, cell)
@@ -184,13 +206,24 @@ def merge_third_row(table, rahshal):
 
 def style_the_docx_table(table):
     """
-    Styles a table in a Word document by setting the column width, aligning the text in the cells, and changing the font name.
+    Styles a table in a Word document by setting the column width, aligning the paragraphs, and changing the font.
 
     Args:
         table (Table): The table object that needs to be styled.
 
     Returns:
-        None. The function modifies the input table object in-place by styling it.
+        None. Modifies the table object directly.
+
+    Example Usage:
+        table = document.add_table(rows=3, cols=4)
+        style_the_docx_table(table)
+
+    Code Analysis:
+        - The function sets the `autofit` property of the table to `False` to prevent the columns from automatically adjusting their width.
+        - It iterates through each column in the table and sets the width of each column to 3 centimeters using the `width` property.
+        - It then iterates through each cell in the table and applies the desired styling to the paragraphs and runs within each cell.
+        - For each paragraph in a cell, it sets the alignment to center using the `alignment` property.
+        - For each run in a paragraph, it changes the font to "Calibri Light" using the `font.name` property.
     """
     table.autofit = False
     # Define the desired column width in centimeters (3 cm)
@@ -210,13 +243,22 @@ def style_the_docx_table(table):
 
 def first_row(table):
     """
-    Sets the text and formatting of the first row of a table.
+    Sets the text and formatting of the first row of a table and applies shading to the first row.
 
     Args:
-        table (Table): The table object in which the first row needs to be modified.
+        table (docx.table.Table): The table object that represents the table in which the first row needs to be modified.
 
     Returns:
-        None. The function modifies the text and formatting of the first row in the table object.
+        None
+
+    Example Usage:
+        # Create a table object
+        table = docx.table.Table()
+
+        # Call the first_row function to set the text and formatting of the first row
+        first_row(table)
+
+        # The first row of the table will have the specified text and formatting, and will be shaded with light gray
     """
     if table_count == 0:
         table.cell(0, 5).text = "שם אזור"
