@@ -4,7 +4,7 @@
 
 ### *This script optimizes a time-consuming task in the military* 💂‍♂️
 
-> No classified data is included in this repository
+> No classified data is included in the repository
 
 > Author : Daniel Dekhtyar  
 > Email : denik2707@gmail.com  
